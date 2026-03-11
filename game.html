@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Details | Gamvora</title>
+  <meta name="description" content="Detailed game page with overview, specs, screenshots, comments, and related titles." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/extra.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="container nav-wrap">
+      <a href="index.html" class="logo">Gam<span>vora</span></a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#allGamesSection" class="active">Games</a>
+      </nav>
+      <div class="search-wrap">
+        <input id="searchInput" type="search" placeholder="Search games…" aria-label="Search" autocomplete="off"
+          onkeydown="if(event.key==='Enter'&&this.value.trim()){window.location='index.html?q='+encodeURIComponent(this.value.trim());}" />
+      </div>
+      <button onclick="document.getElementById('supportModal').classList.add('open')" class="support-nav-btn">💬 Support</button>
+      <div id="authArea" class="auth-area"></div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div id="gameDetailCard"></div>
+
+      <section class="section">
+        <div class="section-head"><h2>Related Games</h2></div>
+        <div id="relatedGrid" class="game-grid compact-grid"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 Gamvora — Designed for a premium gaming experience.</p>
+    </div>
+  </footer>
+
+  <!-- SUPPORT MODAL -->
+  <div id="supportModal" class="modal-overlay">
+    <div class="modal-box">
+      <button onclick="document.getElementById('supportModal').classList.remove('open')" class="modal-close">✕</button>
+      <h2>💬 Contact Support</h2>
+      <p class="modal-sub">Having an issue? Send us a message and we'll get back to you.</p>
+      <form id="supportForm" class="support-form" novalidate>
+        <input type="text"  id="supportName"    placeholder="Your name *"     maxlength="100" required />
+        <input type="email" id="supportEmail"   placeholder="Email address *" maxlength="200" required />
+        <input type="text"  id="supportSubject" placeholder="Subject"          maxlength="200" />
+        <textarea id="supportMessage" placeholder="Describe your issue… *" rows="4" maxlength="2000" required></textarea>
+        <button type="submit" class="btn primary">Send Message</button>
+        <p id="supportMsg" class="admin-msg"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:"AIzaSyDcuGgXdXJRrQsHH8Ug-6q4wAvYKWRq60I",
+      authDomain:"lucifer-fc8e1.firebaseapp.com",
+      databaseURL:"https://lucifer-fc8e1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId:"lucifer-fc8e1",
+      storageBucket:"lucifer-fc8e1.firebasestorage.app",
+      messagingSenderId:"856462709600",
+      appId:"1:856462709600:web:459ee7d2707e031d3a4405"
+    });
+  </script>
+  <script src="js/games.js"></script>
+  <script src="js/comments.js"></script>
+  <script>
+    /* Support form */
+    document.getElementById('supportForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name    = String(document.getElementById('supportName').value||'').replace(/<[^>]*>/g,'').trim().slice(0,100);
+      const email   = String(document.getElementById('supportEmail').value||'').replace(/<[^>]*>/g,'').trim().slice(0,200);
+      const subject = String(document.getElementById('supportSubject').value||'').replace(/<[^>]*>/g,'').trim().slice(0,200);
+      const message = String(document.getElementById('supportMessage').value||'').replace(/<[^>]*>/g,'').trim().slice(0,2000);
+      const msg     = document.getElementById('supportMsg');
+      if(!name||!email||!message){msg.textContent='Name, email, and message are required.';msg.className='admin-msg error';return;}
+      const btn=e.target.querySelector('button[type=submit]');btn.disabled=true;
+      try{
+        await firebase.database().ref('support').push({name,email,subject,message,timestamp:Date.now(),status:'open'});
+        msg.textContent="Message sent! We'll get back to you soon.";msg.className='admin-msg success';
+        e.target.reset();
+        setTimeout(()=>document.getElementById('supportModal')?.classList.remove('open'),2500);
+      }catch(err){msg.textContent='Failed to send. Try again.';msg.className='admin-msg error';}
+      finally{btn.disabled=false;}
+    });
+
+    /* Close modal on backdrop click */
+    document.getElementById('supportModal')?.addEventListener('click',(e)=>{
+      if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');
+    });
+
+    /* Init detail page */
+    (async () => {
+      try {
+        await GV.renderGameDetailsPage();
+      } catch (e) {
+        const root = document.getElementById('gameDetailCard');
+        if (root) root.innerHTML = `<div class="not-found"><h1>Error</h1><p>${e.message}</p><a href="index.html" class="btn primary">← Back</a></div>`;
+      }
+    })();
+  </script>
+</body>
+</html>

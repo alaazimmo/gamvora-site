@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gamvora | Premium Game Downloads</title>
+  <meta name="description" content="Discover, filter, and download PC games — Gamvora, your premium gaming hub." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/extra.css" />
+</head>
+<body>
+
+
+  <!-- NAVBAR -->
+  <header class="topbar">
+    <div class="container nav-wrap">
+      <a href="index.html" class="logo">Gam<span>vora</span></a>
+      <nav class="nav-links">
+        <a href="index.html" class="active">Home</a>
+        <a href="#allGamesSection">Games</a>
+      </nav>
+      <div class="search-wrap">
+        <input id="searchInput" type="search" placeholder="Search games…" aria-label="Search games" autocomplete="off" spellcheck="false" />
+        <div id="searchDropdown" class="search-dropdown" style="display:none;"></div>
+      </div>
+      <button id="supportBtn" class="support-nav-btn">💬 Support</button>
+      <div id="authArea" class="auth-area"></div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="epic-hero">
+      <div class="container">
+        <div class="hero-panel">
+          <div>
+            <p class="kicker">PREMIUM PC LIBRARY</p>
+            <h1>Build Your Ultimate <span>Game Collection</span></h1>
+            <p>Advanced filtering, rich details, high-performance browsing, and one-click magnet activation.</p>
+            <a href="#allGamesSection" class="btn primary large">Browse Games</a>
+          </div>
+          <div id="featuredHeroCard" class="featured-hero-card"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTERS -->
+    <section class="section filters-section">
+      <div class="container">
+        <div class="filter-bar">
+          <select id="genreFilter" aria-label="Filter by genre">
+            <option value="">All Genres</option>
+          </select>
+          <select id="sizeFilter" aria-label="Filter by size">
+            <option value="">All Sizes</option>
+            <option value="small">Under 2 GB</option>
+            <option value="medium">2 GB – 20 GB</option>
+            <option value="large">Over 20 GB</option>
+          </select>
+          <select id="sortFilter" aria-label="Sort games">
+            <option value="relevance">Sort: Relevance</option>
+            <option value="titleAsc">Title A → Z</option>
+            <option value="titleDesc">Title Z → A</option>
+            <option value="sizeAsc">Size: Low → High</option>
+            <option value="sizeDesc">Size: High → Low</option>
+          </select>
+          <button id="clearFiltersBtn" class="btn secondary">Clear Filters</button>
+        </div>
+        <div id="activeFilters" class="active-filters"></div>
+      </div>
+    </section>
+
+    <!-- TRENDING -->
+    <section class="section" id="trendingSection">
+      <div class="container">
+        <div class="section-head"><h2>🔥 Trending Now</h2></div>
+        <div id="trendingGrid" class="game-grid compact-grid"></div>
+      </div>
+    </section>
+
+    <!-- MOST DOWNLOADED -->
+    <section class="section" id="popularSection">
+      <div class="container">
+        <div class="section-head"><h2>⬇ Most Downloaded</h2></div>
+        <div id="popularGrid" class="game-grid compact-grid"></div>
+      </div>
+    </section>
+
+    <!-- ALL GAMES -->
+    <section class="section" id="allGamesSection">
+      <div class="container">
+        <div class="section-head">
+          <h2>🎮 All Games</h2>
+          <p id="resultsInfo">Loading…</p>
+        </div>
+        <div id="gamesGrid" class="game-grid"></div>
+        <div class="load-more-wrap">
+          <button id="loadMoreBtn" class="btn secondary" style="display:none;">Load More</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 Gamvora — Designed for a premium gaming experience. &nbsp;|&nbsp; <a href="report.html" style="color:var(--text3)">Report Issue</a></p>
+    </div>
+  </footer>
+
+  <!-- SUPPORT MODAL -->
+  <div id="supportModal" class="modal-overlay">
+    <div class="modal-box">
+      <button id="supportModalClose" class="modal-close" aria-label="Close">✕</button>
+      <h2>💬 Contact Support</h2>
+      <p class="modal-sub">Having an issue? Send us a message and we'll get back to you.</p>
+      <form id="supportForm" class="support-form" novalidate>
+        <input type="text"  id="supportName"    placeholder="Your name *"    maxlength="100" required />
+        <input type="email" id="supportEmail"   placeholder="Email address *" maxlength="200" required />
+        <input type="text"  id="supportSubject" placeholder="Subject"         maxlength="200" />
+        <textarea id="supportMessage" placeholder="Describe your issue… *" rows="4" maxlength="2000" required></textarea>
+        <button type="submit" class="btn primary">Send Message</button>
+        <p id="supportMsg" class="admin-msg"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:"AIzaSyDcuGgXdXJRrQsHH8Ug-6q4wAvYKWRq60I",
+      authDomain:"lucifer-fc8e1.firebaseapp.com",
+      databaseURL:"https://lucifer-fc8e1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId:"lucifer-fc8e1",
+      storageBucket:"lucifer-fc8e1.firebasestorage.app",
+      messagingSenderId:"856462709600",
+      appId:"1:856462709600:web:459ee7d2707e031d3a4405"
+    });
+  </script>
+  <script src="js/games.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

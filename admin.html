@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel | Gamvora</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/extra.css" />
+</head>
+<body class="admin-page">
+
+  <!-- Admin Login (shown when not authenticated as admin) -->
+  <div id="adminLogin" class="admin-login-wrap" style="display:none;">
+    <div class="admin-login-card">
+      <a href="index.html" class="logo center">Gam<span>vora</span></a>
+      <h1>Admin Access</h1>
+      <p>This area is restricted to administrators only.</p>
+      <form id="adminLoginForm" class="admin-login-form" novalidate>
+        <input type="email"    id="adminEmail"    placeholder="Admin email"    autocomplete="email"            required />
+        <input type="password" id="adminPassword" placeholder="Admin password" autocomplete="current-password" required />
+        <button type="submit" class="btn primary">Login as Admin</button>
+        <p id="adminLoginMsg" class="admin-msg"></p>
+      </form>
+      <p style="text-align:center;margin-top:16px;font-size:.82rem;color:var(--text3)">
+        <a href="index.html" style="color:var(--text3)">← Back to site</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Admin Panel (shown when authenticated as admin) -->
+  <div id="adminPanel" style="display:none;">
+
+    <!-- Admin Topbar -->
+    <header class="admin-topbar">
+      <a href="index.html" class="logo">Gam<span>vora</span> <span style="font-size:.75rem;font-weight:600;color:var(--yellow);margin-left:8px;">ADMIN</span></a>
+      <div class="admin-user-info">
+        <span>👤 <span id="adminName"></span></span>
+        <a href="index.html" class="btn secondary sm">← Site</a>
+        <button id="adminLogoutBtn" class="btn danger sm">Logout</button>
+      </div>
+    </header>
+
+    <div class="admin-panel-wrap" id="adminRoot">
+
+      <!-- Stats -->
+      <div class="admin-stats">
+        <div class="stat-card">
+          <div class="stat-label">Comments</div>
+          <div class="stat-value" id="stat-comments">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Reports</div>
+          <div class="stat-value" id="stat-reports">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Support Msgs</div>
+          <div class="stat-value" id="stat-support">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Added Games</div>
+          <div class="stat-value" id="stat-added">—</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="admin-tabs">
+        <button class="admin-tab-btn" data-tab="games">🎮 Games</button>
+        <button class="admin-tab-btn" data-tab="comments">💬 Comments</button>
+        <button class="admin-tab-btn" data-tab="reports">🚩 Reports</button>
+        <button class="admin-tab-btn" data-tab="support">📩 Support</button>
+      </div>
+
+      <!-- Tab: Games -->
+      <div id="tab-games" class="admin-tab-content"></div>
+
+      <!-- Tab: Comments -->
+      <div id="tab-comments" class="admin-tab-content"></div>
+
+      <!-- Tab: Reports -->
+      <div id="tab-reports" class="admin-tab-content"></div>
+
+      <!-- Tab: Support -->
+      <div id="tab-support" class="admin-tab-content"></div>
+
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:"AIzaSyDcuGgXdXJRrQsHH8Ug-6q4wAvYKWRq60I",
+      authDomain:"lucifer-fc8e1.firebaseapp.com",
+      databaseURL:"https://lucifer-fc8e1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId:"lucifer-fc8e1",
+      storageBucket:"lucifer-fc8e1.firebasestorage.app",
+      messagingSenderId:"856462709600",
+      appId:"1:856462709600:web:459ee7d2707e031d3a4405"
+    });
+  </script>
+  <script src="js/games.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Issue | Gamvora</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/extra.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="container nav-wrap">
+      <a href="index.html" class="logo">Gam<span>vora</span></a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#allGamesSection">Games</a>
+      </nav>
+      <div id="authArea" class="auth-area"></div>
+    </div>
+  </header>
+
+  <main class="report-page">
+    <div class="report-card">
+      <a id="backLink" href="index.html" class="report-back">← Back</a>
+      <h1>🚩 Report an Issue</h1>
+      <p class="report-subtitle">Found a broken download, wrong info, or another problem with <span id="reportGameName" class="report-game-name"></span>? Let us know.</p>
+
+      <form id="reportForm" class="report-form" novalidate>
+        <input type="text" id="reportGameTitle" placeholder="Game title *" maxlength="200" required readonly />
+
+        <select id="reportType" required>
+          <option value="">Select issue type *</option>
+          <option value="Broken Download">Broken Download Link</option>
+          <option value="Wrong Info">Wrong Game Info / Title</option>
+          <option value="Wrong Size">Wrong File Size</option>
+          <option value="Malware">Suspected Malware / Virus</option>
+          <option value="Duplicate">Duplicate Entry</option>
+          <option value="Missing Game">Missing Game</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <textarea id="reportDescription" placeholder="Describe the issue in detail… *" rows="5" maxlength="2000" required></textarea>
+
+        <input type="email" id="reportEmail" placeholder="Your email (optional — for follow-up)" maxlength="200" />
+
+        <button type="submit" class="btn primary">Submit Report</button>
+        <p id="reportMsg" class="report-msg"></p>
+      </form>
+    </div>
+  </main>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:"AIzaSyDcuGgXdXJRrQsHH8Ug-6q4wAvYKWRq60I",
+      authDomain:"lucifer-fc8e1.firebaseapp.com",
+      databaseURL:"https://lucifer-fc8e1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId:"lucifer-fc8e1",
+      storageBucket:"lucifer-fc8e1.firebasestorage.app",
+      messagingSenderId:"856462709600",
+      appId:"1:856462709600:web:459ee7d2707e031d3a4405"
+    });
+  </script>
+  <script src="js/games.js"></script>
+  <script>
+    (async () => {
+      GV.renderAuthArea();
+
+      /* Read game title from URL */
+      const params    = new URLSearchParams(window.location.search);
+      const titleSlug = params.get('title') || '';
+      const backLink  = document.getElementById('backLink');
+      const gameTitleInput = document.getElementById('reportGameTitle');
+      const gameNameSpan   = document.getElementById('reportGameName');
+
+      if (titleSlug) {
+        backLink.href = `game.html?title=${titleSlug}`;
+        try {
+          const games = await GV.loadGames();
+          const game  = games.find(g => GV.slugify(g.title) === titleSlug);
+          if (game) {
+            const displayTitle = game.baseTitle || game.title;
+            gameTitleInput.value = displayTitle;
+            gameNameSpan.textContent = `"${displayTitle}"`;
+          } else {
+            const fallback = decodeURIComponent(titleSlug.replace(/-/g,' '));
+            gameTitleInput.value = fallback;
+            gameNameSpan.textContent = `"${fallback}"`;
+          }
+        } catch (_) {
+          const fallback = decodeURIComponent(titleSlug.replace(/-/g,' '));
+          gameTitleInput.value = fallback;
+          gameNameSpan.textContent = `"${fallback}"`;
+        }
+      }
+
+      /* Rate limit: 1 report per 5 minutes */
+      const canReport = () => {
+        const last = parseInt(localStorage.getItem('gv_last_report') || '0', 10);
+        return Date.now() - last > 5 * 60 * 1000;
+      };
+
+      /* Submit report */
+      document.getElementById('reportForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const gameTitle   = String(gameTitleInput.value || '').replace(/<[^>]*>/g,'').trim().slice(0,200);
+        const type        = String(document.getElementById('reportType').value || '').replace(/<[^>]*>/g,'').trim();
+        const description = String(document.getElementById('reportDescription').value || '').replace(/<[^>]*>/g,'').trim().slice(0,2000);
+        const email       = String(document.getElementById('reportEmail').value || '').replace(/<[^>]*>/g,'').trim().slice(0,200);
+        const msg         = document.getElementById('reportMsg');
+
+        if (!gameTitle) { msg.textContent = 'Game title is required.'; msg.className = 'report-msg error'; return; }
+        if (!type)      { msg.textContent = 'Please select an issue type.'; msg.className = 'report-msg error'; return; }
+        if (!description || description.length < 10) { msg.textContent = 'Please describe the issue (min 10 characters).'; msg.className = 'report-msg error'; return; }
+
+        if (!canReport()) {
+          msg.textContent = 'You can submit one report every 5 minutes. Please wait.';
+          msg.className = 'report-msg error';
+          return;
+        }
+
+        const btn = e.target.querySelector('button[type=submit]');
+        btn.disabled = true;
+        btn.textContent = 'Submitting…';
+
+        try {
+          await firebase.database().ref('reports').push({
+            gameTitle,
+            gameSlug: titleSlug,
+            type,
+            description,
+            email: email || 'Anonymous',
+            timestamp: Date.now(),
+            status: 'open'
+          });
+          localStorage.setItem('gv_last_report', Date.now().toString());
+          msg.textContent = '✅ Report submitted successfully! Thank you for helping improve Gamvora.';
+          msg.className = 'report-msg success';
+          e.target.reset();
+          gameTitleInput.value = gameTitle;
+          setTimeout(() => {
+            if (titleSlug) window.location.href = `game.html?title=${titleSlug}`;
+          }, 3000);
+        } catch (err) {
+          msg.textContent = 'Failed to submit report. Please try again.';
+          msg.className = 'report-msg error';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Submit Report';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

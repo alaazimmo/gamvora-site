@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Gamvora</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/extra.css" />
+  <!-- hCaptcha -->
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+</head>
+<body>
+  <main class="auth-page">
+    <div class="auth-card">
+      <a class="logo center" href="index.html">Gam<span>vora</span></a>
+      <h1>Login</h1>
+      <form id="loginForm" class="auth-form" novalidate>
+        <input type="email"    id="email"    placeholder="Email address"  autocomplete="email"            required />
+        <input type="password" id="password" placeholder="Password"       autocomplete="current-password" required />
+        <div class="forgot-link"><a id="forgotPasswordLink" href="#">Forgot Password?</a></div>
+        <!-- hCaptcha widget — test key always passes -->
+        <div class="captcha-wrap">
+          <div class="h-captcha" data-sitekey="10000000-ffff-ffff-ffff-000000000001" data-theme="dark"></div>
+        </div>
+        <button type="submit" class="btn primary">Login</button>
+      </form>
+      <p class="auth-switch">Don't have an account? <a href="register.html">Register</a></p>
+      <p id="authMessage" class="auth-message"></p>
+    </div>
+  </main>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:"AIzaSyDcuGgXdXJRrQsHH8Ug-6q4wAvYKWRq60I",
+      authDomain:"lucifer-fc8e1.firebaseapp.com",
+      databaseURL:"https://lucifer-fc8e1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId:"lucifer-fc8e1",
+      storageBucket:"lucifer-fc8e1.firebasestorage.app",
+      messagingSenderId:"856462709600",
+      appId:"1:856462709600:web:459ee7d2707e031d3a4405"
+    });
+    /* Redirect if already logged in */
+    firebase.auth().onAuthStateChanged(u => { if(u) window.location.href='index.html'; });
+  </script>
+  <script src="js/auth.js"></script>
+</body>
+</html>
